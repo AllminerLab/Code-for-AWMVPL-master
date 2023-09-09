@@ -1,0 +1,44 @@
+clear
+close all
+
+addpath('Subfunctions')
+%% load data
+
+%% COIL 20
+% load('COIL20.mat')
+% dataname = 'COIL20';
+% alpha = 0.05;
+% c = 5;
+% VN = 3;
+% type = 1;
+% r = 4;
+
+fprintf('Datasets: %s, c = %d, alpha = %f ...\n', dataname, c, alpha);
+
+%% parameters
+K = length(unique(y));
+M = length(X);
+N = length(y);
+niter = 30;
+
+%% Normalization
+X = Normalization(X,type);
+
+%% VPML
+[F, Q, S] = VPML(X, c, alpha, M, N, K, niter, r);
+
+%% AWSC 
+[Y, J] = AWSC(Q, S, y, niter, VN);
+
+
+%% Show the clustering performance
+preY = zeros(N, 1);
+for i = 1:N
+    preY(i) = find(Y(:, i) == 1);
+end
+[acc,nmi,pur] = ClusteringMeasure(y, preY);
+fprintf('Clusteing performance:\n');
+fprintf('ACC = %.3f, NMI = %.3f, PUR = %.3f\n', acc, nmi, pur);
+fprintf('------------------------------------------\n');
+fprintf('\n');
+
